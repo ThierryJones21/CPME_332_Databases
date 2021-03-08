@@ -1,0 +1,21 @@
+SELECT * FROM instructor WHERE dept_name = "Comp. Sci." && salary > 70000
+SELECT student.ID, course_id FROM student, takes WHERE student.ID=takes.ID
+SELECT time_slot_id as "Monday Slots" FROM time_slot WHERE day="M"
+SELECT name, course_id FROM student, takes WHERE student.ID=takes.ID ORDER BY name ASC
+SELECT course_id, year, name AS NumCourses2010 FROM teaches, instructor WHERE teaches.ID=instructor.ID AND year<=2010
+SELECT DISTINCT course_id AS NumCourses2010 FROM section WHERE year=2010
+SELECT name FROM instructor UNION SELECT name FROM student
+SELECT course.course_id, semester, year, title FROM section, course 
+WHERE dept_name="Finance" AND course.course_id=section.course_id
+SELECT name, i_id FROM student LEFT JOIN advisor ON ID=s_ID
+SELECT name, student.dept_name, title FROM student, takes, course WHERE student.ID=takes.ID AND takes.course_id=course.course_id
+SELECT name AS Name, year AS Year, COUNT(course_id) AS "Number of Courses" FROM student, takes WHERE student.ID=takes.ID GROUP BY name, year
+SELECT course_id AS FallAndSpring FROM section WHERE year=2009 AND semester="Fall" INTERSECT SELECT course_id AS winter FROM section WHERE year=2010 AND semester="Spring" 
+SELECT DISTINCT ID FROM takes WHERE grade="A" AND ID IN (SELECT ID from takes WHERE grade="C") 
+UPDATE time_slot SET start_time='9:30', end_time=ADDTIME(end_time, '0 1:30:00') WHERE start_time='8:00'
+SELECT * FROM time_slot
+DELETE FROM department WHERE department.dept_name='Comp. Sci.'
+SELECT * FROM department
+
+
+

@@ -1,0 +1,184 @@
+drop database airlineDB;
+create database airlineDB;
+
+
+CREATE TABLE AirplaneType(
+TypeName		VARCHAR(15)	NOT NULL,
+MaxSeats		INTEGER		NOT NULL,
+Company			VARCHAR(15)	NOT NULL,
+PRIMARY KEY(TypeName));
+
+CREATE TABLE Airline(
+AirlineCode		VARCHAR(2)	NOT NULL,
+Name			VARCHAR(255)	NOT NULL,
+PRIMARY KEY(AirlineCode));
+
+CREATE TABLE Airport(
+3DigitAirportCode	VARCHAR(3)	NOT NULL,
+Name			VARCHAR(255)	NOT NULL,
+Province		VARCHAR(15)	NOT NULL,
+City			VARCHAR(15)	NOT NULL,
+PRIMARY KEY(3DigitAirportCode));
+
+CREATE TABLE Airplane(
+BYear			INTEGER		NOT NULL,
+AirplaneID		INTEGER		NOT NULL,
+Type			VARCHAR(15)	NOT NULL,
+AirlineCode		VARCHAR(2)	NOT NULL,
+PRIMARY KEY(AirplaneID),
+FOREIGN KEY(AirlineCode) REFERENCES Airline(AirlineCode) ON DELETE CASCADE,
+FOREIGN KEY(Type) REFERENCES AirplaneType(TypeName) ON DELETE CASCADE
+);
+
+CREATE TABLE Flight(
+AirlineCode		VARCHAR(2)	NOT NULL,
+3DigitFlightCode	INTEGER 	NOT NULL check (3DigitFlightCode between 000 and 999),
+PlaneID			INTEGER 	NOT NULL,	
+PRIMARY KEY(3DigitFlightCode, AirlineCode),
+FOREIGN KEY(AirlineCode) REFERENCES Airline(AirlineCode) ON DELETE CASCADE,
+FOREIGN KEY(PlaneID) REFERENCES Airplane(AirplaneID) ON DELETE CASCADE
+);
+
+CREATE TABLE Supports(
+AirportID	VARCHAR(3)	NOT NULL,
+AirplaneType	VARCHAR(15)	NOT NULL,
+PRIMARY KEY(AirportID, AirplaneType),
+FOREIGN KEY(AirportID) REFERENCES Airport(3DigitAirportCode) ON DELETE CASCADE,
+FOREIGN KEY(AirplaneType) REFERENCES AirplaneType(TypeName) ON DELETE CASCADE
+);
+
+CREATE TABLE Arrival(
+AirlineID		VARCHAR(2)	NOT NULL,
+AirportArriving		VARCHAR(3)	NOT NULL,
+FlightCode		INTEGER		NOT NULL check (FlightCode between 000 and 999),
+ScheduledArrivalTime	TIME		NOT NULL,
+ActualArrivalTime	TIME,		
+PRIMARY KEY(FlightCode, AirlineID, AirportArriving),
+FOREIGN KEY(AirportArriving) REFERENCES Airport(3DigitAirportCode) ON DELETE CASCADE,
+FOREIGN KEY(FlightCode, AirlineID) REFERENCES Flight(3DigitFlightCode, AirlineCode) ON DELETE CASCADE
+);
+
+CREATE TABLE Departure(
+AirlineID		VARCHAR(2)	NOT NULL,
+AirportDeparting	VARCHAR(3)	NOT NULL,
+FlightCode		INTEGER		NOT NULL check (FlightCode between 000 and 999),
+ScheduledDepartureTime	TIME		NOT NULL,
+ActualDepartureTime	TIME,		
+PRIMARY KEY(FlightCode, AirlineID, AirportDeparting),
+FOREIGN KEY(AirportDeparting) REFERENCES Airport(3DigitAirportCode) ON DELETE CASCADE,
+FOREIGN KEY(FlightCode, AirlineID) REFERENCES Flight(3DigitFlightCode, AirlineCode) ON DELETE CASCADE
+);
+
+CREATE TABLE DaysOffered(
+AirlineID	VARCHAR(2)	NOT NULL,
+FlightCode	INTEGER		NOT NULL check (FlightCode between 000 and 999),
+DayOffered	VARCHAR(9)	NOT NULL,
+PRIMARY KEY(FlightCode, AirlineID, DayOffered),
+FOREIGN KEY(FlightCode, AirlineID) REFERENCES Flight(3DigitFlightCode, AirlineCode) ON DELETE CASCADE
+);
+
+insert into AirplaneType values
+('747', 100, 'Boeing'),
+('Challenger 600', 19, 'Airbus'),
+('Learjet 70/75', 9, 'Bombardier'),
+('777', 80, 'Boeing'),
+('737', 150, 'Boeing'),
+('787', 230, 'Boeing'),
+('CRJ700', 74, 'Bombardier')
+;
+
+insert into Airline values
+('AC', 'Air Canada'),
+('PA', 'Porter Airlines'),
+('AN', 'Air Nunavut'),
+('XC','KD Air')
+;
+
+insert into Airport values
+('YYZ', 'Toronto Pearson International Airport', 'ON', 'Toronto'),
+('YVR', 'Vancouver International Airport', 'BC', 'Vancouver'),
+('YOW', 'Ottawa Macdonald–Cartier International Airport', 'ON', 'Ottawa'),
+('YQR','Regina International Airport', 'SK', 'Regina')
+;
+
+insert into Airplane values
+(1990, 111, 'Challenger 600', 'AC'),
+(1980, 555, 'Learjet 70/75', 'AC'),
+(2000, 222, '747', 'PA'),
+(2005, 666, 'Challenger 600', 'PA'),
+(1987, 333, '777', 'AN'),
+(2001, 777, '787', 'AN'),
+(2005, 444, 'Learjet 70/75', 'XC'),
+(2015, 888, 'CRJ700', 'XC')
+;
+
+insert into Flight values
+('AC', 001, 111),
+('PA', 002, 222),
+('AN', 003, 333),
+('XC', 004, 444),
+('AC', 005, 555),
+('PA', 006, 666),
+('AN', 007, 777),
+('XC', 008, 888)
+;
+
+insert into Supports values
+('YYZ', 'Challenger 600'),
+('YYZ', '747'),
+('YYZ', 'Learjet 70/75'),
+('YYZ', '787'),
+('YYZ', 'CRJ700'),
+('YYZ', '777'),
+('YOW', 'Challenger 600'),
+('YOW', '747'),
+('YOW', 'Learjet 70/75'),
+('YOW', '787'),
+('YOW', 'CRJ700'),
+('YOW', '777'),
+('YQR', 'Challenger 600'),
+('YQR', '747'),
+('YQR', 'Learjet 70/75'),
+('YQR', '787'),
+('YQR', 'CRJ700'),
+('YQR', '777'),
+('YVR', 'Challenger 600'),
+('YVR', '747'),
+('YVR', 'Learjet 70/75'),
+('YVR', '787'),
+('YVR', 'CRJ700'),
+('YVR', '777')
+;
+
+insert into Departure values
+('AC', 'YYZ', 001, '16:20', '17:09'),
+('PA', 'YOW', 002, '11:20', '12:00'),
+('AN', 'YQR', 003, '7:20', '7:30'),
+('XC', 'YVR', 004, '13:30', NULL),
+('AC', 'YYZ', 005, '16:20', '17:09'),
+('PA', 'YOW', 006, '11:20', '12:00'),
+('AN', 'YQR', 007, '7:20', '7:30'),
+('XC', 'YVR', 008, '13:30', NULL)
+;
+
+insert into Arrival values
+('AC', 'YOW', 001, '17:45', '18:50'),
+('PA', 'YQR', 002, '16:40', NULL),
+('AN', 'YVR', 003, '9:30', '9:44'),
+('XC', 'YOW', 004, '19:40', '20:32'),
+('AC', 'YOW', 005, '17:45', '18:50'),
+('PA', 'YQR', 006, '16:40', NULL),
+('AN', 'YVR', 007, '9:30', '9:44'),
+('XC', 'YOW', 008, '19:40', '20:32')
+;
+
+insert into DaysOffered values
+('AC', 001, 'Monday'),
+('PA', 002, 'Sunday'),
+('AN', 003, 'Friday'),
+('XC', 004, 'Tuesday'),
+('AC', 005, 'Wednesday'),
+('PA', 006, 'Saturday'),
+('AN', 007, 'Sunday'),
+('XC', 008, 'Thursday')
+;
